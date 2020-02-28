@@ -73,6 +73,18 @@ class Automate {
         }
 
         this.II = II;
+        // filling the transition table
+        this.transitionTable = {};
+        for(var i in II) {
+            var s1 = II[i][0];
+            var x = II[i][1];
+            var s2 = II[i][2];
+            this.transitionTable[s1] = this.transitionTable[s1] || {};
+            if (this.transitionTable[s1][x])
+                this.transitionTable[s1][x].push(s2);
+            else 
+                this.transitionTable[s1][x] = [s2];
+        }
     }
 
     ajouterInstruction(s1, x, s2) {
@@ -84,5 +96,21 @@ class Automate {
             throw "l'alphabet " + x + " n'est pas dans l'ensemble X.";
 
         this.II.push([s1, x, s2]);
+        // updating transition table
+        this.transitionTable[s1] = this.transitionTable[s1] || {};
+        if (this.transitionTable[s1][x])
+            this.transitionTable[s1][x].push(s2);
+        else 
+            this.transitionTable[s1][x] = [s2];
+    }
+
+    isDeterministe() {
+        for(var i in this.transitionTable){
+            for(var x in this.X) {
+                if(this.transitionTable[i][this.X[x]] && this.transitionTable[i][this.X[x]].length != 1)
+                    return false;
+            }
+        }
+        return true;
     }
 }
