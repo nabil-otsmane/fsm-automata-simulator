@@ -40,9 +40,26 @@ class Automate {
         this.S.push(s);
     }
 
-    setEtatInit(S0) {
-        if(!this.S.includes(S0))
-            throw "l'etat initial "+ S0 +" n'est pas dans l'ensemble des etats.";
+    supprimerEtat(s) {
+        if(!this.S.includes(s))
+            throw "l'etat " + s + " n'existe pas dans S.";
+        this.S = this.S.filter(x => x !== s);
+        this.F = this.F.filter(x => x !== s);
+        this.S0 = this.S0.filter(x => x !== s);
+        this.II = this.II.filter(x => x[0] !== s && x[2] !== s);
+        delete this.transitionTable[s];
+        for(var i in this.transitionTable) {
+            for(var x in this.transitionTable[i])
+            {
+                this.transitionTable[i][x] = this.transitionTable[i][x].filter(x => x !== s);
+            }
+        }
+    }
+
+    setEtatsInit(S0) {
+        for(var i in S0)
+            if(!this.S.includes(S0[i]))
+                throw "l'etat initial "+ S0[i] +" n'est pas dans l'ensemble des etats.";
         this.S0 = S0;
     }
 
@@ -104,13 +121,64 @@ class Automate {
             this.transitionTable[s1][x] = [s2];
     }
 
+    /**
+     * voir si l'automate est deterministe ou pas
+     * @returns {boolean} true ou false selon l'automate est deterministe ou pas (respectivement)
+     *
+     */
     isDeterministe() {
+        if(this.S0.length > 1)
+            return false;
         for(var i in this.transitionTable){
             for(var x in this.X) {
-                if(this.transitionTable[i][this.X[x]] && this.transitionTable[i][this.X[x]].length != 1)
+                if(this.transitionTable[i][this.X[x]] && this.transitionTable[i][this.X[x]].length > 1)
                     return false;
             }
         }
         return true;
+    }
+
+    isAccessible(s) {
+        var tmp = arguments.length === 2 && arguments[1];
+        if(this.S0.includes(s))
+            return true;
+        else  // watch for infinite loops
+        {
+            var filter = this.II.filter(x => x[2] === s);
+            for(var i in filter)
+            {
+                if(tmp && tmp === filter[i][0])
+                    continue;
+                if(this.isAccessible(filter[i][0], tmp || s))
+                    return true
+            }
+        }
+        return false;
+    }
+
+    isCoaccessible(s) {
+        var tmp = arguments.length === 2 && arguments[1];
+        if(this.F.includes(s))
+            return true;
+        else {
+            var filter = this.II.filter(x => x[0] === s);
+            for(var i in filter)
+            {
+                if(tmp && tmp === filter[i][2])
+                    continue;
+                if(this.isCoaccessible(filter[i][2], tmp || s))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    AutomateReduit() {
+        var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        for(var s in A.S){
+            if(!A.isAccessible(A.S[s]) || !A.isCoaccessible(A.S[s]))
+                A.supprimerEtat(A.S[s]);
+        }
+        return A;
     }
 }
