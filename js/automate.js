@@ -15,7 +15,7 @@ class Automate {
     constructor(X, S, S0, F, II) {
         this.setAlphabet(X);
         this.setEtats(S);
-        this.setEtatInit(S0);
+        this.setEtatsInit(S0);
         this.setEtatsFinaux(F);
         this.setInstructions(II);
     }
@@ -144,9 +144,10 @@ class Automate {
             return true;
         else  // watch for infinite loops
         {
-            var filter = this.II.filter(x => x[2] === s);
+            var filter = this.II.filter(x => x[2] === s && x[0] !== s);
             for(var i in filter)
             {
+
                 if(tmp && tmp === filter[i][0])
                     continue;
                 if(this.isAccessible(filter[i][0], tmp || s))
@@ -161,7 +162,7 @@ class Automate {
         if(this.F.includes(s))
             return true;
         else {
-            var filter = this.II.filter(x => x[0] === s);
+            var filter = this.II.filter(x => x[0] === s && x[2] !== s);
             for(var i in filter)
             {
                 if(tmp && tmp === filter[i][2])
@@ -173,12 +174,99 @@ class Automate {
         return false;
     }
 
+    reconnaissance(w) {
+        if(!this.isDeterministe())
+            throw "this Automate has to be deterministe to do this. (for now)";
+        if(typeof w !== 'string')
+            throw "word must be a string";
+        if(w === "" && this.F.includes(this.S0[0]))
+            return true;
+
+        var curS = this.S0[0];
+        for(var i in w) {
+            var next = this.II.find(x => x[0] === curS && x[1] === w[i]);
+            if(!next)
+                return false;
+            curS = next[2];
+        }
+        if(!this.F.includes(curS))
+            return false;
+        return true;
+    }
+
     AutomateReduit() {
         var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
-        for(var s in A.S){
-            if(!A.isAccessible(A.S[s]) || !A.isCoaccessible(A.S[s]))
-                A.supprimerEtat(A.S[s]);
+        var S = A.S;
+        for(var s in S){
+            if(!A.isAccessible(S[s]) || !A.isCoaccessible(S[s]))
+                A.supprimerEtat(S[s]);
         }
         return A;
     }
+
+    AutomateMiroir() {
+        var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        // on permute les instructions
+        /* il faut changer aussi la table */
+        for(var i in A.II){
+            var tmp = A.II[i][0];
+            A.II[i][0] = A.II[i][2];
+            A.II[i][2] = tmp;
+        }
+        // on permute entre les etats finaux et les etats initiaux
+        var tmp = A.F;
+        A.setEtatsFinaux(A.S0);
+        A.setEtatsInit(tmp);
+
+        return A;
+    }
+
+    AutomateDeterministe() {
+        if(this.isDeterministe()) // il est deja deterministe
+            return this;
+
+        var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        A.setInstructions([]);
+        for(var k in this.transitionTable) {
+            for(var j in this.transitionTable[k]){
+                var s2 = this.transitionTable[k][j];
+                if(s2.length == 1)
+                    A.ajouterInstruction(k, j, s2);
+                if(s2.length > 1){
+                    var s = s2.join('-');
+                    A.ajouterEtat(s);
+                    A.ajouterInstruction(k, j, s);
+                }
+            }
+        }  // TODO: to be completed
+
+        return A;
+    }
+
+    isComplet() {
+        for(var s in this.S){
+            for(var x in this.X) {
+                if(!this.II.find(e => e[0] === this.S[s] && e[1] === this.X[x]))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    AutomateComplet() {
+        if(this.isComplet())
+            return this;
+
+        var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        A.ajouterEtat('Sp');
+        for(var x in A.X) {
+            A.ajouterInstruction('Sp', A.X[x], 'Sp');
+            for(var s in A.S)
+                if(!A.II.find(e => e[0] === A.S[s] && e[1] === A.X[x])){
+                    A.ajouterInstruction(A.S[s], A.X[x], 'Sp');
+                }
+        }
+    }
+
+
 }
