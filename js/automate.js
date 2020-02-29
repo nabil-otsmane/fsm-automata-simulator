@@ -262,11 +262,22 @@ class Automate {
         for(var x in A.X) {
             A.ajouterInstruction('Sp', A.X[x], 'Sp');
             for(var s in A.S)
-                if(!A.II.find(e => e[0] === A.S[s] && e[1] === A.X[x])){
-                    A.ajouterInstruction(A.S[s], A.X[x], 'Sp');
-                }
+                if(!A.II.find(e => e[0] === A.S[s] && e[1] === A.X[x]))
+                    A.ajouterInstruction(A.S[s], A.X[x], 'Sp');    
         }
+        return A;
     }
 
+    AutomateComplement() {
+        var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        if(!A.isDeterministe())
+            A = A.AutomateDeterministe();
+        if(!A.isComplet())
+            A = A.AutomateComplet();
+        
+        A.setEtatsFinaux(A.S.filter(x => !A.F.includes(x)));
+
+        return A;
+    }
 
 }
