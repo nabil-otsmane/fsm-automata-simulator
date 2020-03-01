@@ -121,6 +121,15 @@ class Automate {
             this.transitionTable[s1][x] = [s2];
     }
 
+    supprimerInstruction(s1, x, s2) {
+        var id = this.II.findIndex(e => e[0] === s1 && e[1] === x && e[2] === s2)
+        if(id === -1)
+            throw "can't find instruction to delete";
+
+        this.transitionTable[s1][x] = this.transitionTable[s1][x].filter(e => e !== s2);
+        this.II.splice(id, 1);
+    }
+
     /**
      * voir si l'automate est deterministe ou pas
      * @returns {boolean} true ou false selon l'automate est deterministe ou pas (respectivement)

@@ -5,15 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Automate d'etat finie</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <script type="text/javascript" src="js/automate.js"></script>
     <script type="text/javascript" src="js/simuator.js"></script>
     <link href="css/main.css" rel="stylesheet" />
 </head>
 <body>
     <div id="content">
-        <span class="col nav"></span>
-        <span class="col options"></span>
-        <span class="col board"></span>
+        <span class="col nav">
+            <button class="nbtn" title="Modifier Automate">+</button>
+            <button class="nbtn" title="To deterministe">-></button>
+            <button class="nbtn" title="To miroir">wR</button>
+            <button class="nbtn" title="To Complement">not A</button>
+            <button class="nbtn" title='To reduit'>A'</button>
+            <button class="nbtn" title='reconnaissance'>w?</button>
+            <button class="nbtn" title="Settings">props</button>
+        </span>
+        <span class="col options">
+            <h3 id="optitle">Automate</h3>
+            <section>
+                <h4>Alphabet</h4>
+                <code>
+                    X={<span id="ens1"></span>}
+                    <button class="add" onclick="addToEns('ens1',setX)">+</button>
+                </code>
+            </section>
+            <section>
+                <h4>Etats</h4>
+                <code>
+                    S={<span id="ens2"></span>}
+                    <button class="add" onclick="addToEns('ens2',addEtat,modifyEtat,removeEtat)">+</button>
+                </code>
+            </section>
+            <section>
+                <h4>Etats Initiaux</h4>
+                <code>
+                    S0={<span id="ens3"></span>}
+                    <button class="add" onclick="addToEns('ens3',setS0)">+</button>
+                </code>
+            </section>
+            <section>
+                <h4>Etats finaux</h4>
+                <code>
+                    F={<span id="ens4"></span>}
+                    <button class="add" onclick="addToEns('ens4',setF)">+</button>
+                </code>
+            </section>
+            <section>
+                <h4>Instructions</h4>
+                <code>
+                    II={<span id="ens5"></span>}
+                    <button class="add" onclick="addIToEns('ens5',addInstruction,modifyInstruction,removeInstruction)">+</button>
+                </code>
+            </section>
+        </span>
+        <span class="col"  id="board">
+
+        </span>
     </div>
+    <script type="text/javascript">
+        initNetwork('board');
+    </script>
 </body>
 </html>
