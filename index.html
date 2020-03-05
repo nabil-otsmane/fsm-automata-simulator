@@ -14,20 +14,21 @@
     <div id="content">
         <span class="col nav">
             <button class="nbtn" title="Modifier Automate">+</button>
-            <button class="nbtn" title="To deterministe">-></button>
-            <button class="nbtn" title="To miroir">wR</button>
-            <button class="nbtn" title="To Complement">not A</button>
-            <button class="nbtn" title='To reduit'>A'</button>
+            <button class="nbtn fnc" title="To deterministe" onclick="drawDeterministe()">-></button>
+            <button class="nbtn fnc" title="To miroir" onclick="drawMiroir()">wR</button>
+            <button class="nbtn fnc" title="To Complement" onclick="drawComplement()">not A</button>
+            <button class="nbtn fnc" title='To reduit' onclick="drawReduit()">A'</button>
             <button class="nbtn" title='reconnaissance'>w?</button>
             <button class="nbtn" title="Settings">props</button>
         </span>
         <span class="col options">
             <h3 id="optitle">Automate</h3>
+            <p>A&lt;X, S, S0, F, II&gt;</p>
             <section>
                 <h4>Alphabet</h4>
                 <code>
                     X={<span id="ens1"></span>}
-                    <button class="add" onclick="addToEns('ens1',setX)">+</button>
+                    <button class="add" onclick="addToEns('ens1', addAlpha, modifyAlpha, removeAlpha)">+</button>
                 </code>
             </section>
             <section>
@@ -41,14 +42,14 @@
                 <h4>Etats Initiaux</h4>
                 <code>
                     S0={<span id="ens3"></span>}
-                    <button class="add" onclick="addToEns('ens3',setS0)">+</button>
+                    <button class="add" onclick="addToEns('ens3', addEtatInit, modifyEtatInit, removeEtatInit)">+</button>
                 </code>
             </section>
             <section>
                 <h4>Etats finaux</h4>
                 <code>
                     F={<span id="ens4"></span>}
-                    <button class="add" onclick="addToEns('ens4',setF)">+</button>
+                    <button class="add" onclick="addToEns('ens4', addEtatFinal, modifyEtatFinal, removeEtatFinal)">+</button>
                 </code>
             </section>
             <section>

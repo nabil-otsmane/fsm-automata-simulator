@@ -30,6 +30,31 @@ class Automate {
         this.X = X;
     }
 
+    ajouterAlpha(x) {
+        if(typeof x != "string")
+            throw `${x} has to be a string.`;
+        if(x.length != 1)
+            throw `${x} is not a single caractere.`;
+        if(this.X.includes(x))
+            throw "charactere " + x + " already exists in alphabet";
+        
+        this.X.push(x);
+    }
+
+    modifierAlpha(x, y) {
+        if(this.X.includes(y))
+            throw `charactere ${y} already in X.`;
+        var id = this.X.indexOf(x);
+        if(id === -1)
+            throw x + " is not in the alphabet";
+
+        this.X[id] = y;
+    }
+
+    supprimerAlpha(x) {
+        this.X = this.X.filter(e => e !== x);
+    }
+
     setEtats(S) {
         this.S = S;
     }
@@ -63,6 +88,33 @@ class Automate {
         this.S0 = S0;
     }
 
+    ajouterEtatInit(s0) {
+        if(!this.S.includes(s0))
+            throw `etat ${s0} not in S.`;
+        if(this.S0.includes(s0))
+            throw `etat ${s0} already in S0.`;
+
+        this.S0.push(s0);
+    }
+
+    modifierEtatInit(s0, s1) {
+        if(this.S0.includes(s1))
+            throw `etat ${s1} already in S0.`;
+        var id = this.S0.indexOf(s0);
+        if(id === -1)
+            throw `etat ${s0} not in S0.`;
+
+        this.S0[id] = s1;
+    }
+
+    supprimerEtatInit(s0) {
+        var id = this.S0.indexOf(s0);
+        if(id === -1)
+            throw `etat ${s0} not in S0.`;
+        
+        this.S0.splice(id, 1);
+    }
+
     setEtatsFinaux(F) {
         for(var s in F) {
             if(!this.S.includes(F[s]))
@@ -71,46 +123,55 @@ class Automate {
         this.F = F;
     }
 
-    ajouterEtatFinal(f) {
-        if(!this.S.includes(f))
-            throw "l'etat " + s + " n'est pas dans l'ensemble des etats.";
+    ajouterEtatFinal(s0) {
+        if(!this.S.includes(s0))
+            throw `etat ${s0} not in S.`;
+        if(this.F.includes(s0))
+            throw `etat ${s0} already in S0.`;
 
-        this.F.push(f);
+        this.F.push(s0);
+    }
+
+    modifierEtatFinal(s0, s1) {
+        if(this.F.includes(s1))
+            throw `etat ${s1} already in S0.`;
+        var id = this.F.indexOf(s0);
+        if(id === -1)
+            throw `etat ${s0} not in S0.`;
+
+        this.F[id] = s1;
+    }
+
+    supprimerEtatFinal(s0) {
+        var id = this.F.indexOf(s0);
+        if(id === -1)
+            throw `etat ${s0} not in S0.`;
+        
+        this.F.splice(id, 1);
     }
 
     setInstructions(II) {
+        this.II = [];
+        // filling the transition table
+        this.transitionTable = {};
         for(var i in II)
         {
             if(!Array.isArray(II[i]) || II[i].length != 3)
                 throw "l'element " + II[i] + " n'est pas reconnu comme instruction";
-            if(!this.S.includes(II[i][0]) || !this.S.includes(II[i][2]))
-                throw "un etat de l'instruction n'est pas dans l'ensemble des etats.";
-            if(!this.X.includes(II[i][1]))
-                throw II[i][1] + " n'est pas dans l'alphabet.";
-        }
-
-        this.II = II;
-        // filling the transition table
-        this.transitionTable = {};
-        for(var i in II) {
-            var s1 = II[i][0];
-            var x = II[i][1];
-            var s2 = II[i][2];
-            this.transitionTable[s1] = this.transitionTable[s1] || {};
-            if (this.transitionTable[s1][x])
-                this.transitionTable[s1][x].push(s2);
-            else 
-                this.transitionTable[s1][x] = [s2];
+            
+            this.ajouterInstruction(...II[i]);
         }
     }
 
     ajouterInstruction(s1, x, s2) {
         if(!this.S.includes(s1))
-            throw "l'etat " + s1 + " n'est pas dans l'ensemble des etats.";
+            throw "l'etat " + s1 + " n'est pas dans S.";
         if(!this.S.includes(s2))
-            throw "l'etat " + s2 + " n'est pas dans l'ensemble des etats.";
+            throw "l'etat " + s2 + " n'est pas dans S.";
         if(!this.X.includes(x))
-            throw "l'alphabet " + x + " n'est pas dans l'ensemble X.";
+            throw "l'alphabet " + x + " n'est pas dans X.";
+        if(this.II.find(e => e[0] === s1 && e[1] === x && e[2] === s2))
+            throw `l'instruction (${s1}, ${x}, ${s2}) already in II.`;
 
         this.II.push([s1, x, s2]);
         // updating transition table
@@ -231,10 +292,11 @@ class Automate {
     }
 
     AutomateDeterministe() {
-        if(this.isDeterministe()) // il est deja deterministe
-            return this;
-
         var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
+        
+        if(A.isDeterministe()) // il est deja deterministe
+            return A;
+        
         A.setInstructions([]);
         for(var k in this.transitionTable) {
             for(var j in this.transitionTable[k]){
