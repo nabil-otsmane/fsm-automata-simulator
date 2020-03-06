@@ -41,13 +41,13 @@ function addToEns(id, add, modify, remove, value, focus) {
             try {
                 if(i === -1)
                     add(this.value);
-                else
+                else if(i !== this.value)
                     modify(i, this.value);
 
                 i = this.value;
             } catch(e) {
                 alert(e);
-                inp.value = '';
+                inp.value = i===-1?'':i;
                 inp.focus();
             }
         }
@@ -96,20 +96,27 @@ function addIToEns(id, add, modify, remove, value, focus) {
     var i = [-1, -1, -1];
     function blur(e, x) {
         if(e.target.value !== ''){
+            var tmp = [...i];
             try {
-                var tmp = [...i];
                 i[x] = e.target.value;
                 if(!i.includes(-1))
                 {
                     if(tmp[x] === -1)
                     {
                         add(i);
-                    } else {
+                    } else if(tmp[x] !== i[x]) {
                         modify(tmp, i);
                     }
                 }
-            } catch(e) {
-                alert(e);
+            } catch(ee) {
+                alert(ee);
+                // remove element
+                if(tmp.includes(-1))
+                    ens.removeChild(cont);
+                else {
+                    e.target.value = tmp[x];
+                    i = [...tmp];
+                }
             }
         } else {
             i[x] = -1;
@@ -191,23 +198,83 @@ function setII(elem) {
     //*/
 }
 
-function drawInst(ins) {
-    var edge = {
-        id: edgeIds.length,
-        from: nodeIds.find(x => x.label === ins[0]).id,
-        to: nodeIds.find(x => x.label === ins[2]).id,
-        label: ins[1]
-    };
-    edgeIds.push(edge);
-    edges.add(edge);
+function addAlpha(x) {
+    A.ajouterAlpha(x);
 }
 
-function drawSuppInst(ins) {
-    var edge = edgeIds.find(e => e.from === nodeIds.find(x => x.label === ins[0]).id
-    && e.to === nodeIds.find(x => x.label === ins[2]).id 
-    && e.label === ins[1]);
+function modifyAlpha(x, y) {
+    A.modifierAlpha(x, y);
+    refreshII(A);
+    for(var i in A.II) {
+        if(A.II[i][1] === y){
+            drawSuppInst([A.II[i][0], x, A.II[i][2]]);
+            drawInst(A.II[i]);
+        }
+    }
+}
 
-    edges.remove(edge);
+function removeAlpha(x) {
+    var I = A.II;
+    A.supprimerAlpha(x);
+    refreshII(A);
+    for(var i in I){
+        if(I[i][1] === x){
+            drawSuppInst(I[i]);
+        }
+    }
+}
+
+function addEtat(etat) {
+    A.ajouterEtat(etat);
+    drawEtat(etat);
+}
+
+function modifyEtat(etat0, etat1) {
+    A.modifierEtat(etat0, etat1);
+    drawModifEtat(etat0, etat1);
+    refreshS0(A);
+    refreshF(A);
+    refreshII(A);
+}
+
+function removeEtat(etat) {
+    A.supprimerEtat(etat);
+    drawSuppEtat(etat);
+    refreshS0(A);
+    refreshF(A);
+    refreshII(A);
+}
+
+function addEtatInit(s0) {
+    A.ajouterEtatInit(s0);
+    drawEtatInit(s0, true);
+}
+
+function modifyEtatInit(s0, s1) {
+    A.modifierEtatInit(s0, s1);
+    drawEtatInit(s0, false);
+    drawEtatInit(s1, true);
+}
+
+function removeEtatInit(s0) {
+    A.supprimerEtatInit(s0);
+    drawEtatInit(s0, false);
+}
+
+function addEtatFinal(s0) {
+    A.ajouterEtatFinal(s0);
+    drawEtatFinal(s0, true);
+}
+
+function modifyEtatFinal(s0, s1) {
+    A.modifierEtatFinal(s0, s1);
+    drawEtatFinal(s0, false);
+    drawEtatFinal(s1, true);
+}
+
+function removeEtatFinal(s0) {
+    A.supprimerEtatFinal(s0);
+    drawEtatFinal(s0, false);
 }
 
 function addInstruction(ins) {
@@ -221,20 +288,9 @@ function removeInstruction(ins) {
 }
 
 function modifyInstruction(ins0, ins1) {
-    removeInstruction(ins0);
-    addInstruction(ins1);
-}
-
-function addAlpha(x) {
-    A.ajouterAlpha(x);
-}
-
-function modifyAlpha(x, y) {
-    A.modifierAlpha(x, y);
-}
-
-function removeAlpha(x) {
-    A.supprimerAlpha(x);
+    A.modifierInstruction(ins0, ins1);
+    drawSuppInst(ins0);
+    drawInst(ins1);
 }
 
 function drawEtat(etat) {
@@ -269,52 +325,23 @@ function drawEtatFinal(etat, isFinal) {
     nodes.update([nodeIds[id]]);
 }
 
-function addEtat(etat) {
-    A.ajouterEtat(etat);
-    drawEtat(etat);
+function drawInst(ins) {
+    var edge = {
+        id: edgeIds.length,
+        from: nodeIds.find(x => x.label === ins[0]).id,
+        to: nodeIds.find(x => x.label === ins[2]).id,
+        label: ins[1]
+    };
+    edgeIds.push(edge);
+    edges.add(edge);
 }
 
-function modifyEtat(etat0, etat1) {
-    A.supprimerEtat(etat0);
-    A.ajouterEtat(etat1);
-    drawModifEtat(etat0, etat1);
-}
+function drawSuppInst(ins) {
+    var edge = edgeIds.find(e => e.from === nodeIds.find(x => x.label === ins[0]).id
+    && e.to === nodeIds.find(x => x.label === ins[2]).id 
+    && e.label === ins[1]);
 
-function removeEtat(etat) {
-    A.supprimerEtat(etat);
-    drawSuppEtat(etat);
-}
-
-function addEtatInit(s0) {
-    A.ajouterEtatInit(s0);
-    drawEtatInit(s0, true);
-}
-
-function modifyEtatInit(s0, s1) {
-    A.modifierEtatInit(s0, s1);
-    drawEtatInit(s0, false);
-    drawEtatInit(s1, true);
-}
-
-function removeEtatInit(s0) {
-    A.removeEtatInit(s0);
-    drawEtatInit(s0, false);
-}
-
-function addEtatFinal(s0) {
-    A.ajouterEtatFinal(s0);
-    drawEtatFinal(s0, true);
-}
-
-function modifyEtatFinal(s0, s1) {
-    A.modifierEtatFinal(s0, s1);
-    drawEtatFinal(s0, false);
-    drawEtatFinal(s1, true);
-}
-
-function removeEtatFinal(s0) {
-    A.supprimerEtatFinal(s0);
-    drawEtatFinal(s0, false);
+    edges.remove(edge);
 }
 
 function initNetwork(id) {
@@ -348,6 +375,7 @@ function initNetwork(id) {
         var finalPositions = network.getPositions(final);
 
         ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 0.3;
         for(var i in final) {
             ctx.beginPath();
             ctx.arc(
@@ -361,13 +389,84 @@ function initNetwork(id) {
             ctx.stroke();
         }
         for(var i in init) {
-            var x = initPositions[init[i]].x;
-            var y = initPositions[init[i]].y;
-            ctx.moveTo(x-30, y-30);
-            ctx.lineTo(x-15, y-15);
+            var ox = initPositions[init[i]].x;
+            var oy = initPositions[init[i]].y;
+            var b = 5;
+            var off1 = 2.5;
+            var x1 = 30 + off1, y1 = 30 - b;
+            var x2 = 15 + off1, y2 = 15 - b;
+            ctx.moveTo(ox-x1, oy-y1);
+            ctx.lineTo(ox-x2, oy-y2);
+            var off2 = 3.5;
+            var rx = 30 - off2;
+            var rx2 = 15 - off2;
+            var ry = rx + b;
+            var ry2 = rx2 + b;
+            ctx.moveTo(ox-rx, oy-ry);
+            ctx.lineTo(ox-rx2, oy-ry2);
+
+            var cx = 11;
+            var cy = 10;
+            // find line equation y = ax + b
+            var a = (ry2-cy)/(rx2-cx);
+            var b = ry2 - a*rx2;
+            var x = 11.9;
+            ctx.moveTo(ox-x, oy-(a*x+b));
+            ctx.lineTo(ox-cx, oy-cy);
+            a = (y2-cy)/(x2-cx);
+            b = y2 - a*x2;
+            x = 23;
+            ctx.lineTo(ox-x, oy-(a*x+b));
             ctx.stroke();
         }
     });
+}
+
+function clearElems(){
+    for(var i=0;i < arguments.length;i++){
+        var elem = document.getElementById(arguments[i]);
+        elem.innerHTML = '';
+    }
+}
+
+function refreshX(B, draw) {
+    clearElems('ens1');
+    for(var i in B.X){
+        addToEns('ens1', addAlpha, modifyAlpha, removeAlpha, B.X[i], true);
+        draw && addAlpha(B.X[i]);
+    }
+}
+
+function refreshS(B, draw) {
+    clearElems('ens2');
+    for(var i in B.S){
+        addToEns('ens2', addEtat, modifyEtat, removeEtat, B.S[i], true);
+        draw && addEtat(B.S[i]);
+    }
+}
+
+function refreshS0(B, draw) {
+    clearElems('ens3');
+    for(var i in B.S0){
+        addToEns('ens3', addEtatInit, modifyEtatInit, removeEtatInit, B.S0[i], true);
+        draw && addEtatInit(B.S0[i]);
+    }
+}
+
+function refreshF(B, draw) {
+    clearElems('ens4');
+    for(var i in B.F){
+        addToEns('ens4', addEtatFinal, modifyEtatFinal, removeEtatFinal, B.F[i], true);
+        draw && addEtatFinal(B.F[i]);
+    }
+}
+
+function refreshII(B, draw) {
+    clearElems('ens5');
+    for(var i in B.II){
+        addIToEns('ens5', addInstruction, modifyInstruction, removeInstruction, B.II[i], true);
+        draw && addInstruction(B.II[i]);
+    }
 }
 
 /**
@@ -380,34 +479,16 @@ function drawAutomate(B) {
     edges.clear();
     edgeIds = [];
     nodeIds = [];
-    ['ens1', 'ens2', 'ens3', 'ens4', 'ens5'].map(e => {
-        var elem = document.getElementById(e);
-        elem.innerHTML = '';
-    });
-    for(var i in B.X){
-        addToEns('ens1', addAlpha, modifyAlpha, removeAlpha, B.X[i], true);
-        addAlpha(B.X[i]);
-    }
 
-    for(var i in B.S){
-        addToEns('ens2', addEtat, modifyEtat, removeEtat, B.S[i], true);
-        addEtat(B.S[i]);
-    }
+    refreshX(B, !0);
 
-    for(var i in B.S0){
-        addToEns('ens3', addEtatInit, modifyEtatInit, removeEtatInit, B.S0[i], true);
-        addEtatInit(B.S0[i]);
-    }
+    refreshS(B, !0);
 
-    for(var i in B.F){
-        addToEns('ens4', addEtatFinal, modifyEtatFinal, removeEtatFinal, B.F[i], true);
-        addEtatFinal(B.F[i]);
-    }
+    refreshS0(B, !0);
 
-    for(var i in B.II) {
-        addIToEns('ens5', addInstruction, modifyInstruction, removeInstruction, B.II[i], true);
-        addInstruction(B.II[i]);
-    }
+    refreshF(B, !0);
+
+    refreshII(B, !0);
 }
 
 function drawReduit() {
