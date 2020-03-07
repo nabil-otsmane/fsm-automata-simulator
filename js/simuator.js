@@ -105,10 +105,12 @@ function addIToEns(id, add, modify, remove, value, focus) {
                     {
                         add(i);
                     } else if(tmp[x] !== i[x]) {
-                        modify(tmp, i);
+                        modify(tmp, [...i]);
                     }
                 }
             } catch(ee) {
+                if(ee instanceof Error)
+                    console.log(ee);
                 alert(ee);
                 // remove element
                 if(tmp.includes(-1))
@@ -293,8 +295,9 @@ function modifyInstruction(ins0, ins1) {
     drawInst(ins1);
 }
 
+var etatId = 0;
 function drawEtat(etat) {
-    var node = {id: nodeIds.length, label: etat, isEtatInit: false, isEtatFinal: false};
+    var node = {id: etatId++, label: etat, isEtatInit: false, isEtatFinal: false};
 
     nodeIds.push(node);
     nodes.add(node);
@@ -325,9 +328,10 @@ function drawEtatFinal(etat, isFinal) {
     nodes.update([nodeIds[id]]);
 }
 
+var instId = 0;
 function drawInst(ins) {
     var edge = {
-        id: edgeIds.length,
+        id: instId++,
         from: nodeIds.find(x => x.label === ins[0]).id,
         to: nodeIds.find(x => x.label === ins[2]).id,
         label: ins[1]
@@ -337,11 +341,12 @@ function drawInst(ins) {
 }
 
 function drawSuppInst(ins) {
-    var edge = edgeIds.find(e => e.from === nodeIds.find(x => x.label === ins[0]).id
-    && e.to === nodeIds.find(x => x.label === ins[2]).id 
-    && e.label === ins[1]);
+    var id = edgeIds.findIndex(
+        e => e.from === nodeIds.find(x => x.label === ins[0]).id
+        && e.to === nodeIds.find(x => x.label === ins[2]).id
+        && e.label === ins[1]);
 
-    edges.remove(edge);
+    edges.remove(edgeIds.splice(id, 1)[0]);
 }
 
 function initNetwork(id) {

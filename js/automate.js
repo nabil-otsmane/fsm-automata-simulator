@@ -231,7 +231,7 @@ class Automate {
         if(!this.X.includes(ins1[1]))
             throw "le charactere " + ins1[1] + " n'est pas dans X.";
         if(this.II.find(e => e[0] === ins1[0] && e[1] === ins1[1] && e[2] === ins1[2]))
-            throw `l'instruction (${s1}, ${x}, ${s2}) already in II.`;
+            throw `l'instruction (${ins1[0]}, ${ins1[1]}, ${ins1[2]}) already in II.`;
         var id = this.II.findIndex(e => e[0] === ins[0] && e[1] === ins[1] && e[2] === ins[2]);
         if(id === -1)
             throw `l'instruction (${ins[0]}, ${ins[1]}, ${ins[2]}) n'est pas dans II.`;
