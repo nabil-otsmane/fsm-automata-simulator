@@ -301,7 +301,7 @@ class Automate {
         return false;
     }
 
-    reconnaissance(w) {
+    reconnaissance(w, chemin) {
         if(!this.isDeterministe())
             throw "this Automate has to be deterministe to do this. (for now)";
         if(typeof w !== 'string')
@@ -309,12 +309,15 @@ class Automate {
         if(w === "" && this.F.includes(this.S0[0]))
             return true;
 
+        
         var curS = this.S0[0];
+        chemin.push(curS);
         for(var i in w) {
             var next = this.II.find(x => x[0] === curS && x[1] === w[i]);
             if(!next)
                 return false;
             curS = next[2];
+            chemin.push(curS);
         }
         if(!this.F.includes(curS))
             return false;

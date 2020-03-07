@@ -523,8 +523,11 @@ function reconnaissance() {
     var mot = prompt("entrer le mot: ");
     inst.style.display = 'block';
     try {
-        var res = A.reconnaissance(mot)?'est':"n'est pas";
+        var chemin = [];
+        var res = A.reconnaissance(mot, chemin)?'est':"n'est pas";
+        out.style.color = "#000000"
         out.innerHTML = `le mot "${mot}" ${res} reconnue par A.`;
+        steps.innerHTML = chemin.join('->');
     } catch(e) {
         out.innerHTML = `ERREUR: ${e}`;
         out.style.color = "#ff0000"
