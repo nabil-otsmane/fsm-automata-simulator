@@ -33,3 +33,18 @@ body {
 .in3 {
     width: 30px;
 }
+
+#instructions {
+    padding: 20px;
+    position: relative;
+    top: -221px;
+    height: 180px;
+    border-top: 1px #000000 dashed;
+    background-color: whitesmoke;
+}
+
+#close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}

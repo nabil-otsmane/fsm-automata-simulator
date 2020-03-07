@@ -515,3 +515,23 @@ function drawDeterministe() {
 function drawComplet() {
     drawAutomate(A.AutomateComplet());
 }
+
+function reconnaissance() {
+    var inst = document.getElementById('instructions');
+    var out = document.getElementById('out');
+    var steps = document.getElementById('steps');
+    var mot = prompt("entrer le mot: ");
+    inst.style.display = 'block';
+    try {
+        var res = A.reconnaissance(mot)?'est':"n'est pas";
+        out.innerHTML = `le mot "${mot}" ${res} reconnue par A.`;
+    } catch(e) {
+        out.innerHTML = `ERREUR: ${e}`;
+        out.style.color = "#ff0000"
+    }
+}
+
+function clik() {
+    var inst = document.getElementById('instructions');
+    inst.style.display = 'none';
+}

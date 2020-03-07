@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Automate d'etat finie</title>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <script type="text/javascript" src="js/vis.min.js"></script>
     <script type="text/javascript" src="js/automate.js"></script>
     <script type="text/javascript" src="js/simuator.js"></script>
     <link href="css/main.css" rel="stylesheet" />
@@ -19,7 +19,7 @@
             <button class="nbtn fnc" title="Miroir" onclick="drawMiroir()">wR</button>
             <button class="nbtn fnc" title="Complement" onclick="drawComplement()">not A</button>
             <button class="nbtn fnc" title='Reduit' onclick="drawReduit()">A'</button>
-            <button class="nbtn" title='reconnaissance'>w?</button>
+            <button class="nbtn" title='reconnaissance' onclick="reconnaissance()">w?</button>
             <!--<button class="nbtn" title="Settings">props</button>-->
         </span>
         <span class="col options">
@@ -62,11 +62,19 @@
             </section>
         </span>
         <span class="col"  id="board">
-
+            <span id="graph">
+            </span>
+            <div id="instructions" style="display: none;">
+                <h3>Output : </h3>
+                <p id="out"></p>
+                <h3>Steps :</h3>
+                <p id="steps"></p>
+                <button id="close" onclick="clik()">x</button>
+            </div>
         </span>
     </div>
     <script type="text/javascript">
-        initNetwork('board');
+        initNetwork('graph');
     </script>
 </body>
 </html>
