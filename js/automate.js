@@ -58,12 +58,22 @@ class Automate {
             if(this.II[i][1] === x)
                 this.II[i][1] = y;
         }
+        for(var i in this.transitionTable) {
+            if (x in this.transitionTable[i]){
+                this.transitionTable[i][y] = this.transitionTable[i][x];
+                delete this.transitionTable[i][x];
+            }
+        }
     }
 
     supprimerAlpha(x) {
         this.X = this.X.filter(e => e !== x);
         // modify instructions
         this.II = this.II.filter(e => e[1] !== x);
+        for(var i in this.transitionTable) {
+            if(x in this.transitionTable[i])
+                delete this.transitionTable[i][x];
+        }
     }
 
     setEtats(S) {
@@ -99,6 +109,16 @@ class Automate {
                 this.II[i][0] = sn;
             if(this.II[i][2] === s)
                 this.II[i][2] = sn;
+        }
+        for(var i in this.transitionTable) {
+            for(var j in this.transitionTable[i])
+                for(var k in this.transitionTable[i][j])
+                    if(this.transitionTable[i][j][k] === s)
+                        this.transitionTable[i][j][k] = sn;
+            if(s === i) {
+                this.transitionTable[sn] = this.transitionTable[i];
+                delete this.transitionTable[i];
+            }
         }
     }
 
@@ -237,6 +257,7 @@ class Automate {
             throw `l'instruction (${ins[0]}, ${ins[1]}, ${ins[2]}) n'est pas dans II.`;
         
         this.II[id] = ins1;
+        this.setInstructions(this.II);
     }
 
     supprimerInstruction(s1, x, s2) {
@@ -352,6 +373,15 @@ class Automate {
     }
 
     AutomateDeterministe() {
+        /*if(this.S0.length > 1)
+            throw "S0 length has to be < 2 (for now).";
+        var ens = [];
+        var elem = this.S0[0];
+        while(!ens.includes(elem)){
+            
+        }*/
+
+
         var A = new Automate(this.X, this.S, this.S0, this.F, this.II);
         
         if(A.isDeterministe()) // il est deja deterministe
